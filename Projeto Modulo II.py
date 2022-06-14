@@ -1,0 +1,1 @@
+{nome: 'Ricardo Meca' , e-mail: 'ricardo@lets.com', genero: ['rock', 'samba'], instrumentos: ['violino', 'flauta', 'pandero']}
