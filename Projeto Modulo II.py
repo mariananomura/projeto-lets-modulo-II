@@ -64,17 +64,24 @@ def validacao_email(novo_usuario: dict, banco_de_dados: list):
             pass
 
 
+def validacao_numerica(minimo: int, frase_input: str):
+    input_usuario = input(frase_input)
+    while input_usuario.isdigit() == False or int(input_usuario) < minimo:
+        if input_usuario.isdigit() == False:
+            print("Opção inválida! Digite um número.")
+            input_usuario = input(frase_input)
+        elif int(input_usuario) < minimo:
+            print(f"É preciso incluir pelo menos {minimo} opção/opções)")
+            input_usuario = input(frase_input)
+    return input_usuario
+
+
+
 def cadastro_generos(novo_usuario:dict): #Precisa corrigir algumas validações. Exemplo: ao digitar um numero quando se pede um instrumento musical, da erro.
     generos = []
-    quantidade_generos = input("Quantos gêneros músicais deseja incluir? ")
-    while quantidade_generos.isdigit() == False or int(quantidade_generos) <= 0:
-        if quantidade_generos.isdigit() == False:
-            print("Opção inválida! Digite um número.")
-            quantidade_generos = input("Quantos gêneros músicais deseja incluir? ")
-        elif int(quantidade_generos) <= 0:
-            print("É preciso incluir pelo menos um gênero musical.")
-            quantidade_generos = input("Quantos gêneros músicais deseja incluir? ")
-    
+    minimo = 1
+    frase_input = "Quantos gêneros músicais deseja incluir? "
+    quantidade_generos = validacao_numerica(minimo, frase_input)
     generos_adicionados = 0
     while generos_adicionados < int(quantidade_generos):
         adicionando = input("Digite um gênero musicial: ").lower()
@@ -86,17 +93,10 @@ def cadastro_generos(novo_usuario:dict): #Precisa corrigir algumas validações.
 
 def cadastro_instrumentos(novo_usuario:dict): #Mesmos bugs cadastro de generos
     instrumentos = []
-    quantidade_instrumentos = input("Quantos instrumentos deseja incluir? ")
-    while quantidade_instrumentos.isdigit() == False or int(quantidade_instrumentos) <= 0:
-        if quantidade_instrumentos.isdigit() == False:
-            print("Opção inválida! Digite um número.")
-            quantidade_instrumentos = input("Quantos instrumentos músicais deseja incluir? ")
-        elif int(quantidade_instrumentos) <= 0:
-            print("É preciso incluir pelo menos um instrumento musical.")
-            quantidade_instrumentos = input("Quantos instrumentos músicais deseja incluir? ")
-
+    minimo = 1
+    frase_input = "Quantos instrumentos músicais deseja incluir? "
+    quantidade_instrumentos = validacao_numerica(minimo, frase_input)
     instrumentos_adicionados = 0
-
     while instrumentos_adicionados < int(quantidade_instrumentos):
         adicionando = input("Digite o instrumento: ").lower()
         instrumentos.append(adicionando)
@@ -184,13 +184,16 @@ def busca(banco_de_dados:list): #Só faz busca por um parametro
 
 
 def saida_resultados(resultados: list):
-    print("Resultado(s) encontrado(s):\n")
-    for resultado in resultados:
-        print(
-        f"Nome: {resultado['nome']}\n"
-        f"Endereço de e-mail: {resultado['email']}\n"
-        f"Gêneros: {', '.join(resultado['generos'])}\n"
-        f"Instrumentos: {', '.join(resultado['instrumentos'])}\n")
+    if bool(resultados) == True:
+        print("Resultado(s) encontrado(s):\n")
+        for resultado in resultados:
+            print(
+            f"Nome: {resultado['nome']}\n"
+            f"Endereço de e-mail: {resultado['email']}\n"
+            f"Gêneros: {', '.join(resultado['generos'])}\n"
+            f"Instrumentos: {', '.join(resultado['instrumentos'])}\n")
+    else:
+        print("\nNenhum resultado encontrado.\n")
 
 #MODIFICAR
 
@@ -265,33 +268,34 @@ def modifica(banco_de_dados):
 #MONTAR BANDA   
 
 def seleciona_musicos_genero(banco_de_dados):
-    genero_escolhido = input("Digite o gênero desejado da sua banda: ")
-    usuarios_encontratos = 0
-    lista_usuarios_encontratos = []
+    genero_escolhido = input("Digite o gênero desejado da sua banda: ").lower()
+    usuarios_encontrados = 0
+    lista_usuarios_encontrados = []
     for usuario in banco_de_dados:
         if genero_escolhido in usuario["generos"]:
-            usuarios_encontratos+=1
-            lista_usuarios_encontratos.append(usuario)
-    if usuarios_encontratos > 0:
-        print(f"Foram encontrados {usuarios_encontratos} usuarios que tocam {genero_escolhido}.")
-    elif usuarios_encontratos <= 0:
-        print(f"Não foram encontrados usuarios que tocam{genero_escolhido}.")
-    return lista_usuarios_encontratos
+            usuarios_encontrados+=1
+            lista_usuarios_encontrados.append(usuario)
+    if usuarios_encontrados > 0:
+        print(f"> Foram encontrados {usuarios_encontrados} usuarios que tocam {genero_escolhido}.")
+        # for usuario in lista_usuarios_encontrados:
+        #     mod_cadastro_exibir(usuario)
+    elif usuarios_encontrados <= 0:
+        print(f"> Não foram encontrados usuarios que tocam{genero_escolhido}.")
+    return lista_usuarios_encontrados
 
 
 def escolher_qtde_musicos_instrumentos(lista_usuarios_encontrados):
-    qtde_musicos = int(input("Quantos integrantes devem formar a banda? "))
+    minimo = 2
+    frase_input = "Quantos integrantes devem formar a banda? "
+    qtde_musicos = validacao_numerica(minimo, frase_input)
     instrumentos_selecionados = 0
     lista_instrumentos = []
-    while qtde_musicos <=1:
-        print("Você deve escolher no mínimo 2 (dois) integrantes para a sua banda.")
-        qtde_musicos = int(input("Digite a quantidade de integrantes que devem formar a banda:"))
-    while qtde_musicos > len(lista_usuarios_encontrados):
-            print("Não há músicos o suficiente no nosso banco de dados para formar a banda.\nSugerimos que tente um número de integrantes menor.")
-            qtde_musicos = int(input("Quantos integrantes devem formar a banda? "))
+    while int(qtde_musicos) > len(lista_usuarios_encontrados):
+            print("> Não há músicos o suficiente no nosso banco de dados para formar a banda.\n> Sugerimos que tente um número de integrantes menor.")
+            qtde_musicos = input("Quantos integrantes devem formar a banda? ")
         
-    print("Você pode escolher um instrumento por integrante.")
-    while instrumentos_selecionados < qtde_musicos:
+    print("> Você pode escolher um instrumento por integrante.")
+    while instrumentos_selecionados < int(qtde_musicos):
         lista_instrumentos.append(input("Digite um instrumento desejado: "))
         instrumentos_selecionados+=1
     return lista_instrumentos       
@@ -310,7 +314,20 @@ def seleciona_musicos_instrumento(lista_usuarios_encontrados, lista_instrumentos
     return lista_musicos_selecionados
 
 
-#montar_banda(banco)
+def organiza_musicos_instrumentos(lista_musicos_selecionados):
+    instrumentos_formatados = {}
+    lista_emails = []
+    for instrumento in lista_musicos_selecionados:
+        instrumentos_formatados[instrumento] = []
+        for musico in lista_musicos_selecionados[instrumento]:
+            instrumentos_formatados[instrumento].append(f"{musico['email']} , {instrumento}")
+            lista_emails.append(musico["email"])
+    lista_emails = list(set(lista_emails))
+
+    musico_por_instrumento = []
+    for formatado in instrumentos_formatados:
+        musico_por_instrumento.append(instrumentos_formatados[formatado])
+    return musico_por_instrumento, lista_emails
 
 def formar_bandas(lista_musicos_selecionados):
     if len(lista_musicos_selecionados) == 0:
@@ -322,35 +339,8 @@ def formar_bandas(lista_musicos_selecionados):
             result.append([musico_a, *musico_b])
     return result
 
-banco_de_dados = abre_banco_lista
-banco_de_dados = abre_banco_lista()
-lista_usuarios_encontrados = seleciona_musicos_genero(banco_de_dados)
-lista_instrumentos = escolher_qtde_musicos_instrumentos(lista_usuarios_encontrados)
-print("Instrumentos escolhidos:", ", ".join(lista_instrumentos))
-lista_musicos_selecionados = seleciona_musicos_instrumento(lista_usuarios_encontrados, lista_instrumentos)
 
-
-
-
-instrumentos_formatados = {}
-lista_emails = []
-for instrumento in lista_musicos_selecionados:
-   instrumentos_formatados[instrumento] = []
-   for musico in lista_musicos_selecionados[instrumento]:
-        instrumentos_formatados[instrumento].append(f"{musico['email']} , {instrumento}")
-        lista_emails.append(musico["email"])
-
-
-
-lista_emails = list(set(lista_emails))
-
-musico_por_instrumento = []
-for formatado in instrumentos_formatados:
-    musico_por_instrumento.append(instrumentos_formatados[formatado])
-
-
-bandas_formadas = formar_bandas(musico_por_instrumento)
-def removedor_duplicados(bandas_formadas):
+def removedor_duplicados(bandas_formadas, lista_emails):
     for email in lista_emails:
         indice = 0
         while indice < len(bandas_formadas):
@@ -362,7 +352,28 @@ def removedor_duplicados(bandas_formadas):
                 bandas_formadas.remove(bandas_formadas[indice])
                 indice -=1
             indice +=1
+    return bandas_formadas
 
+def formata_saida_bandas(bandas_finais):
+    if bool(bandas_finais) == False:
+        print("Não foi possível formar uma banda.")
+    else:
+        for banda in bandas_finais:
+            print(banda)
+
+
+
+def montar_banda(banco_de_dados):
+    lista_usuarios_encontrados = seleciona_musicos_genero(banco_de_dados)
+    lista_instrumentos = escolher_qtde_musicos_instrumentos(lista_usuarios_encontrados)
+    print("Instrumentos escolhidos:", ", ".join(lista_instrumentos))
+    lista_musicos_selecionados = seleciona_musicos_instrumento(lista_usuarios_encontrados, lista_instrumentos)
+    resultados = organiza_musicos_instrumentos(lista_musicos_selecionados)
+    musico_por_instrumento = resultados[0]
+    lista_emails = resultados[1]
+    bandas_formadas = formar_bandas(musico_por_instrumento)
+    bandas_finais = removedor_duplicados(bandas_formadas, lista_emails)
+    formata_saida_bandas(bandas_finais)
 
 
 def menu_app_bandas():
@@ -397,8 +408,8 @@ def menu_app_bandas():
             montar_banda(banco_de_dados)
             retornar_encerrar()
 
-# print("Seja bem-vindo(a) ao Formador de Bandas.")
-# menu_app_bandas()
+print("Seja bem-vindo(a) ao Formador de Bandas.")
+menu_app_bandas()
 
 
 
