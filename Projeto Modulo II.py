@@ -1,13 +1,13 @@
 import json
 
-#ABERTURA E REGISTRO NO BANCO DE DADOS
-def abre_banco_lista():
+#UNÇÕES DE REGISTRAR NO BANDO DE DADOS
+def abre_banco_lista() -> list:
     with open('banco_de_dados.json', 'r', encoding='utf-8') as banco:
         banco = list(json.load(banco))
     return banco
 
 
-def registra_banco_de_dados(novo_usuario:dict):   
+def registra_banco_de_dados(novo_usuario:dict) -> None:   
     with open('banco_de_dados.json', 'r', encoding='utf-8') as banco:
         banco = list(json.load(banco))
         banco.append(novo_usuario)
@@ -16,13 +16,12 @@ def registra_banco_de_dados(novo_usuario:dict):
         json.dump(banco, dados, ensure_ascii=False)
 
 
-def registra_tudo(banco_de_dados):
+def registra_tudo(banco_de_dados: list) -> None:
     with open('banco_de_dados.json', 'w', encoding='utf-8') as dados:
         json.dump(banco_de_dados, dados, ensure_ascii=False)
 
-#CADASTRO
-
-def cadastro_nome(novo_usuario:dict):
+#FUNÇÕES DE CADASTRO
+def cadastro_nome(novo_usuario:dict) -> dict:
     nome_usuario = input("Insira seu nome completo (apenas letras e espaços): ").lower()
     while nome_usuario == "":
         nome_usuario = input("É preciso incluir pelo menos um nome: ")
@@ -38,7 +37,7 @@ def cadastro_nome(novo_usuario:dict):
     return novo_usuario
 
     
-def cadastro_email(novo_usuario: dict):
+def cadastro_email(novo_usuario: dict) -> dict:
     email_usuario = input("Insira seu e-mail: ").lower()
     caracteres_validos = ['@','.', '_']
     while '@' and ".com" not in email_usuario:
@@ -55,7 +54,7 @@ def cadastro_email(novo_usuario: dict):
             return novo_usuario
 
 
-def validacao_email(novo_usuario: dict, banco_de_dados: list):
+def validacao_email(novo_usuario: dict, banco_de_dados: list) -> None:
     for usuario in banco_de_dados:
         if novo_usuario["email"] == usuario["email"]:
             print ("E-mail de usuário já cadastrado. Utilize outro e-mail para o cadastro.")
@@ -64,7 +63,7 @@ def validacao_email(novo_usuario: dict, banco_de_dados: list):
             pass
 
 
-def validacao_numerica(minimo: int, frase_input: str):
+def validacao_numerica(minimo: int, frase_input: str) -> str:
     input_usuario = input(frase_input)
     while input_usuario.isdigit() == False or int(input_usuario) < minimo:
         if input_usuario.isdigit() == False:
@@ -76,8 +75,7 @@ def validacao_numerica(minimo: int, frase_input: str):
     return input_usuario
 
 
-
-def cadastro_generos(novo_usuario:dict): #Precisa corrigir algumas validações. Exemplo: ao digitar um numero quando se pede um instrumento musical, da erro.
+def cadastro_generos(novo_usuario:dict) -> dict: 
     generos = []
     minimo = 1
     frase_input = "Quantos gêneros músicais deseja incluir? "
@@ -91,7 +89,7 @@ def cadastro_generos(novo_usuario:dict): #Precisa corrigir algumas validações.
     return novo_usuario
 
 
-def cadastro_instrumentos(novo_usuario:dict): #Mesmos bugs cadastro de generos
+def cadastro_instrumentos(novo_usuario:dict) -> dict: 
     instrumentos = []
     minimo = 1
     frase_input = "Quantos instrumentos músicais deseja incluir? "
@@ -105,7 +103,7 @@ def cadastro_instrumentos(novo_usuario:dict): #Mesmos bugs cadastro de generos
     return novo_usuario
 
 
-def retornar_encerrar():
+def retornar_encerrar() -> None:
     opcao = input("Deseja realizar outra ação?\n"
                 "1 - Sim.\n"
                 "2 - Não.\n")
@@ -115,7 +113,7 @@ def retornar_encerrar():
         print("Encerrando.")
 
 
-def cadastro(banco_de_dados):
+def cadastro(banco_de_dados) -> None:
     novo_usuario = {}
     cadastro_nome(novo_usuario)
     cadastro_email(novo_usuario)
@@ -126,9 +124,8 @@ def cadastro(banco_de_dados):
     print("Cadastro realizado com sucesso!")
 
 
-#BUSCA
-
-def seleciona_parametro():
+#FUNÇÕES BUSCA
+def seleciona_parametro() -> str:
     parametros = []
 
     selecao_parametro = input("Selecione o parametro para sua busca:\n"
@@ -150,7 +147,7 @@ def seleciona_parametro():
     return opcoes[selecao_parametro]
 
 
-def descreve_parametro(selecao_parametro: str):
+def descreve_parametro(selecao_parametro: str) -> str:
 
     opcoes = {
         "nome": "nome",
@@ -163,16 +160,9 @@ def descreve_parametro(selecao_parametro: str):
     
     return descricao_parametro
 
-   
-def mais_parametro(): #Não está funcioando
-    resposta = input("Deseja incluir mais um parametro na sua buscas?\n1 - Sim\n2 - Não.\n")
-    while resposta == "1":
-        seleciona_parametro()
-        if resposta =="2":
-            break
 
 
-def busca(banco_de_dados:list): #Só faz busca por um parametro
+def busca(banco_de_dados:list) -> list: #Só faz busca por um parametro
     
     resultados = []
     chave_parametro = seleciona_parametro()
@@ -183,7 +173,7 @@ def busca(banco_de_dados:list): #Só faz busca por um parametro
     return resultados      
 
 
-def saida_resultados(resultados: list):
+def saida_resultados(resultados: list) -> None:
     if bool(resultados) == True:
         print("Resultado(s) encontrado(s):\n")
         for resultado in resultados:
@@ -195,20 +185,21 @@ def saida_resultados(resultados: list):
     else:
         print("\nNenhum resultado encontrado.\n")
 
-#MODIFICAR
 
-def remover(banco_de_dados, usuario, topico):
+#FUNÇÕES MODIFICAR
+def remover(banco_de_dados, usuario, topico) -> None:
     lista_atual = banco_de_dados[usuario][topico]
     print(f"Lista atual:", ", ".join(lista_atual))
     remocao = input("Digite qual você deseja remover: ")
     if remocao in lista_atual:
         lista_atual.remove(remocao)
         registra_tudo(banco_de_dados)
-        print("Item adicionado ao cadastro.")
+        print("Item removido cadastro.")
     else:
         print("Opção inexistente nno cadastro.")
 
-def adicionar(banco_de_dados, usuario, topico):
+
+def adicionar(banco_de_dados, usuario, topico) -> None:
     lista_atual = banco_de_dados[usuario][topico]
     print(f"Lista atual:", ", ".join(lista_atual))
     adicionar = input("Digite o que você deseja adicionar: ")
@@ -220,7 +211,7 @@ def adicionar(banco_de_dados, usuario, topico):
         print("Opção já existe no cadastro.")
 
 
-def mod_cadastro_seleciona_topico():
+def mod_cadastro_seleciona_topico() -> str:
     topico_modificado = input("Digite a o tipo de alteração desejada:\n1- Alterar gêneros.\n2- Alterar instrumentos.\n")   
     if topico_modificado == "1":
         return "generos"
@@ -229,6 +220,7 @@ def mod_cadastro_seleciona_topico():
     else:
         print("Opção inválida.")
 
+
 def mod_cadastro_seleciona_acao(banco_de_dados, usuario, topico):
     acao = input("Digite a ação que deseja realizar:\n1- Remover \n2- Adicionar.\n")
     if acao == "1":
@@ -236,7 +228,8 @@ def mod_cadastro_seleciona_acao(banco_de_dados, usuario, topico):
     elif acao == "2":
         return adicionar(banco_de_dados, usuario, topico)
 
-def seleciona_usuario_modificar(banco_de_dados: list):
+
+def seleciona_usuario_modificar(banco_de_dados: list) -> int:
     email_selecionado = input("Digite o endereço de e-mail do usuário: ")
     encontrado = False
     usuario = 0
@@ -250,13 +243,14 @@ def seleciona_usuario_modificar(banco_de_dados: list):
         print("Usuário não encontrado")
     
 
-def mod_cadastro_exibir(usuario:dict): #banco_de_dados:list
+def mod_cadastro_exibir(usuario:dict) -> None: #banco_de_dados:list
     print(
         f"Nome: {usuario['nome']}\n"
         f"Gêneros: {', '.join(usuario['generos'])}\n"
         f"Instrumentos: {', '.join(usuario['instrumentos'])}\n")
 
-def modifica(banco_de_dados):
+
+def modifica(banco_de_dados) -> None:
     usuario = seleciona_usuario_modificar(banco_de_dados)
     if bool(usuario)== True:
         mod_cadastro_exibir(banco_de_dados[usuario])
@@ -266,8 +260,7 @@ def modifica(banco_de_dados):
 
 
 #MONTAR BANDA   
-
-def seleciona_musicos_genero(banco_de_dados):
+def seleciona_musicos_genero(banco_de_dados) -> list:
     genero_escolhido = input("Digite o gênero desejado da sua banda: ").lower()
     usuarios_encontrados = 0
     lista_usuarios_encontrados = []
@@ -277,14 +270,22 @@ def seleciona_musicos_genero(banco_de_dados):
             lista_usuarios_encontrados.append(usuario)
     if usuarios_encontrados > 0:
         print(f"> Foram encontrados {usuarios_encontrados} usuarios que tocam {genero_escolhido}.")
-        # for usuario in lista_usuarios_encontrados:
-        #     mod_cadastro_exibir(usuario)
+        escolha = input("Deseja exibir os músicos?\n"
+                        "1 - Sim.\n"
+                        "2 - Não\n")
+        if escolha == "1":
+            for usuario in lista_usuarios_encontrados:
+                mod_cadastro_exibir(usuario)
+        elif escolha == "2":
+            pass
+        else:
+            print("Opção inválida. Músicos não serão exibidos.")
     elif usuarios_encontrados <= 0:
         print(f"> Não foram encontrados usuarios que tocam{genero_escolhido}.")
     return lista_usuarios_encontrados
 
 
-def escolher_qtde_musicos_instrumentos(lista_usuarios_encontrados):
+def escolher_qtde_musicos_instrumentos(lista_usuarios_encontrados) -> list:
     minimo = 2
     frase_input = "Quantos integrantes devem formar a banda? "
     qtde_musicos = validacao_numerica(minimo, frase_input)
@@ -300,7 +301,8 @@ def escolher_qtde_musicos_instrumentos(lista_usuarios_encontrados):
         instrumentos_selecionados+=1
     return lista_instrumentos       
 
-def seleciona_musicos_instrumento(lista_usuarios_encontrados, lista_instrumentos):
+
+def seleciona_musicos_instrumento(lista_usuarios_encontrados, lista_instrumentos) -> list:
     lista_musicos_selecionados = {}
     for instrumentos in lista_instrumentos:
         lista_musicos_selecionados[instrumentos] = []
@@ -314,7 +316,7 @@ def seleciona_musicos_instrumento(lista_usuarios_encontrados, lista_instrumentos
     return lista_musicos_selecionados
 
 
-def organiza_musicos_instrumentos(lista_musicos_selecionados):
+def organiza_musicos_instrumentos(lista_musicos_selecionados) -> list:
     instrumentos_formatados = {}
     lista_emails = []
     for instrumento in lista_musicos_selecionados:
@@ -329,7 +331,8 @@ def organiza_musicos_instrumentos(lista_musicos_selecionados):
         musico_por_instrumento.append(instrumentos_formatados[formatado])
     return musico_por_instrumento, lista_emails
 
-def formar_bandas(lista_musicos_selecionados):
+
+def formar_bandas(lista_musicos_selecionados) -> list:
     if len(lista_musicos_selecionados) == 0:
         return [[]]
     result = []    
@@ -340,7 +343,7 @@ def formar_bandas(lista_musicos_selecionados):
     return result
 
 
-def removedor_duplicados(bandas_formadas, lista_emails):
+def removedor_duplicados(bandas_formadas, lista_emails) -> list:
     for email in lista_emails:
         indice = 0
         while indice < len(bandas_formadas):
@@ -354,16 +357,22 @@ def removedor_duplicados(bandas_formadas, lista_emails):
             indice +=1
     return bandas_formadas
 
-def formata_saida_bandas(bandas_finais):
+
+def formata_saida_bandas(bandas_finais) -> list:
     if bool(bandas_finais) == False:
         print("Não foi possível formar uma banda.")
     else:
+        contador = 1
         for banda in bandas_finais:
-            print(banda)
+            print(f"\nBANDA {contador}:")
+            contador+=1
+            for musico in banda:
+                musico = list(musico.split(" , "))
+                print(f"> Usuario: {musico[0]}")
+                print(f"Instrumento: {musico[1]}")
 
 
-
-def montar_banda(banco_de_dados):
+def montar_banda(banco_de_dados) -> list:
     lista_usuarios_encontrados = seleciona_musicos_genero(banco_de_dados)
     lista_instrumentos = escolher_qtde_musicos_instrumentos(lista_usuarios_encontrados)
     print("Instrumentos escolhidos:", ", ".join(lista_instrumentos))
@@ -376,7 +385,7 @@ def montar_banda(banco_de_dados):
     formata_saida_bandas(bandas_finais)
 
 
-def menu_app_bandas():
+def menu_app_bandas() -> None:
     opcoes = ["1", "2", "3", "4"]
     banco_de_dados = abre_banco_lista()
     escolha = input("Escolha uma opção para continuar:\n"
